@@ -11,9 +11,17 @@ import (
 	"regexp"
 )
 
+const BANNER = `
+ _____ _______ _______ _______  ______ _______  _____  _______  ______
+   |   |______ |______ |       |_____/ |_____| |_____] |______ |_____/
+ __|   ______| ______| |_____  |    \_ |     | |       |______ |    \_
+                                                                      
+`
+
 var client http.Client
 
 func main() {
+	fmt.Println(BANNER)
 	sc := bufio.NewScanner(os.Stdin)
 	for sc.Scan() {
 		url := sc.Text()
