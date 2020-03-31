@@ -2,12 +2,14 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"github.com/fatih/color"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -22,8 +24,21 @@ var client = &http.Client{
 	Timeout: time.Duration(3 * time.Second),
 }
 
+var outputLength string
+var keywordsList string
+
 func main() {
 	fmt.Println(BANNER)
+
+	var keywords string
+	flag.StringVar(&keywords, "k", "auth,pass,token", "comma separeted keywords to find in javascripts (Default: auth,pass,token)")
+	flag.StringVar(&outputLength, "l", "30", "length of the grepped output (Default: 30)")
+	flag.Parse()
+
+	keywordsList = strings.Replace(keywords, ",", "|", -1)
+	color.Magenta("Using regex: " + keywordsList)
+	fmt.Println("")
+
 	sc := bufio.NewScanner(os.Stdin)
 	for sc.Scan() {
 		url := sc.Text()
@@ -84,7 +99,7 @@ func getSecretsFromJS(jsUrl string) {
 			return
 		}
 		bodyString := string(bodyBytes)
-		re := regexp.MustCompile(`(.{30})(token|auth|pass)(.{30})`)
+		re := regexp.MustCompile(`(.{` + outputLength + `})(` + keywordsList + `)(.{` + outputLength + `})`)
 		match := re.FindAllStringSubmatch(bodyString, -1)
 		for _, element := range match {
 			fmt.Print(element[1])
