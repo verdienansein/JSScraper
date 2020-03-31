@@ -102,7 +102,7 @@ func getSecretsFromJS(jsUrl string) {
 			return
 		}
 		bodyString := string(bodyBytes)
-		re := regexp.MustCompile(`(.{` + outputLength + `})(` + keywordsList + `)(.{` + outputLength + `})`)
+		re := regexp.MustCompile(`(?i)(.{` + outputLength + `})(` + keywordsList + `)(.{` + outputLength + `})`)
 		match := re.FindAllStringSubmatch(bodyString, -1)
 		for _, element := range match {
 			fmt.Print(element[1])
