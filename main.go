@@ -20,10 +20,7 @@ const BANNER = `
 
 `
 
-var client = &http.Client{
-	Timeout: time.Duration(3 * time.Second),
-}
-
+var client http.Client
 var outputLength string
 var keywordsList string
 
@@ -33,7 +30,13 @@ func main() {
 	var keywords string
 	flag.StringVar(&keywords, "k", "auth,pass,token", "comma separeted keywords to find in javascripts (Default: auth,pass,token)")
 	flag.StringVar(&outputLength, "l", "30", "length of the grepped output (Default: 30)")
+	var to int
+	flag.IntVar(&to, "t", 10, "timeout (seconds)")
 	flag.Parse()
+
+	client = http.Client{
+		Timeout: time.Duration(to) * time.Second,
+	}
 
 	keywordsList = strings.Replace(keywords, ",", "|", -1)
 	color.Magenta("Using regex: " + keywordsList)
