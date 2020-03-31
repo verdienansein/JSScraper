@@ -44,22 +44,32 @@ func getJavascriptsFromUrl(url string) {
 			return
 		}
 		bodyString := string(bodyBytes)
-		re := regexp.MustCompile(`(https?://[a-zA-Z0-9\.\-/_]+?\.js)`)
-		match := re.FindAllStringSubmatch(bodyString, -1)
-		for _, element := range match {
-			color.Green(element[1])
-			getSecretsFromJS(element[1])
-			fmt.Println("")
-		}
-		re = regexp.MustCompile(`["'](/[a-zA-Z0-9\.\-/_]+?\.js)`)
-		match = re.FindAllStringSubmatch(bodyString, -1)
-		for _, element := range match {
-			absoluteUrl := url + element[1]
-			color.Green(absoluteUrl)
-			getSecretsFromJS(absoluteUrl)
-			fmt.Println("")
-		}
+		getSecretsFromAbsoluteUrls(bodyString)
+		getSecretsFromRelativeUrls(bodyString, url)
 	}
+}
+
+func getSecretsFromAbsoluteUrls(bodyString string) {
+	re := regexp.MustCompile(`(https?://[a-zA-Z0-9\.\-/_]+?\.js)`)
+	match := re.FindAllStringSubmatch(bodyString, -1)
+	for _, element := range match {
+		color.Green(element[1])
+		getSecretsFromJS(element[1])
+		fmt.Println("")
+	}
+
+}
+
+func getSecretsFromRelativeUrls(bodyString string, baseUrl string) {
+	re := regexp.MustCompile(`["'](/[a-zA-Z0-9\.\-/_]+?\.js)`)
+	match := re.FindAllStringSubmatch(bodyString, -1)
+	for _, element := range match {
+		absoluteUrl := baseUrl + element[1]
+		color.Green(absoluteUrl)
+		getSecretsFromJS(absoluteUrl)
+		fmt.Println("")
+	}
+
 }
 
 func getSecretsFromJS(jsUrl string) {
