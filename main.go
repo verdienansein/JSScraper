@@ -5,20 +5,22 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
+	"time"
 )
 
 const BANNER = `
  _____ _______ _______ _______  ______ _______  _____  _______  ______
    |   |______ |______ |       |_____/ |_____| |_____] |______ |_____/
  __|   ______| ______| |_____  |    \_ |     | |       |______ |    \_
-                                                                      
+
 `
 
-var client http.Client
+var client = &http.Client{
+	Timeout: time.Duration(3 * time.Second),
+}
 
 func main() {
 	fmt.Println(BANNER)
@@ -33,13 +35,13 @@ func main() {
 func getJavascriptsFromUrl(url string) {
 	resp, err := client.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 		bodyString := string(bodyBytes)
 		re := regexp.MustCompile(`(https?://\S*?\.js)`)
@@ -55,13 +57,13 @@ func getJavascriptsFromUrl(url string) {
 func getSecretsFromJS(jsUrl string) {
 	resp, err := client.Get(jsUrl)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 		bodyString := string(bodyBytes)
 		re := regexp.MustCompile(`(.{30})(token|auth|pass)(.{30})`)
